@@ -18,8 +18,8 @@ object Zoo {
 
     case class NoMoreAnimalsToVisit()
     case class NextAnimal(animal: Animal)
-
   }
+
   class Visit() {
     import Visit._
     val steps: Iterator[Animal] = animals.iterator
@@ -30,6 +30,5 @@ object Zoo {
       case Left(exception) => Left(NoMoreAnimalsToVisit())
       case Right(animal)   => Right(NextAnimal(animal))
     }
-
   }
 }

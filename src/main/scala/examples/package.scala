@@ -1,4 +1,4 @@
 package object examples {
-  type CommandHandler[Commands, State] = Command => State => Either[String, State]
+  type CommandHandler[Commands, State] = Commands => State => Either[String, State]
 }
 
