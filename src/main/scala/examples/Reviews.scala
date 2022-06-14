@@ -3,18 +3,19 @@ package examples
 object Reviews {
 
   case class ReviewId(id: String)
+  case class ProductId(id: String)
   case class UserId(id: String)
   case class Comment(comment: String)
   case class Rate(rate: Int)
 
   sealed trait Commands
-  case class AddReview(reviewId: ReviewId, userId: UserId, comment: Comment, rate: Rate) extends Commands
+  case class AddReview(reviewId: ReviewId, productId: ProductId, userId: UserId, comment: Comment, rate: Rate) extends Commands
   case class RemoveReview(reviewId: ReviewId) extends Commands
-  case class EditReview(reviewId: ReviewId, userId: UserId, comment: Comment, rate: Rate) extends Commands
+  case class EditReview(reviewId: ReviewId, productId: ProductId, userId: UserId, comment: Comment, rate: Rate) extends Commands
 
-  case class State(reviewList: Map[ReviewId, Map[UserId, Map[Comment, Rate]]]){
-    def addReview(reviewId: ReviewId, userId: UserId, comment: Comment, rate: Rate): State =
-      copy(reviewList = reviewList + (reviewId, Map[userId, Map[comment, rate]]))
+  case class State(reviewList: Map[ReviewId, Map[ProductId, Map[UserId, Map[Comment, Rate]]]]){
+    def addReview(reviewId: ReviewId, productId: ProductId, userId: UserId, comment: Comment, rate: Rate): State =
+      copy(reviewList = reviewList + (reviewId, productId -> (userId -> (comment -> rate))))
     def removeReview(reviewId: ReviewId): State =
       copy(reviewList = reviewList.removed(reviewId))
   }
@@ -27,16 +28,16 @@ object Reviews {
     commands =>
       state =>
         commands match {
-          case AddReview(reviewId: ReviewId, userId: UserId, comment: Comment, rate: Rate)
+          case AddReview(reviewId: ReviewId, productId: ProductId, userId: UserId, comment: Comment, rate: Rate)
             if state.reviewList.contains(reviewId) => Left("This Review was already added")
-          case AddReview(reviewId: ReviewId, userId: UserId, comment: Comment, rate: Rate) =>
-            Right(state.addReview(reviewId, userId, comment, rate))
+          case AddReview(reviewId: ReviewId, productId: ProductId, userId: UserId, comment: Comment, rate: Rate) =>
+            Right(state.addReview(reviewId, productId, userId, comment, rate))
           case RemoveReview(reviewId: ReviewId)
             if !state.reviewList.contains(reviewId) => Left("Review doesn't exist")
           case RemoveReview(reviewId: ReviewId) => Right(state.removeReview(reviewId))
-          case EditReview(reviewId: ReviewId, userId: UserId, comment: Comment, rate: Rate)
+          case EditReview(reviewId: ReviewId, productId: ProductId, userId: UserId, comment: Comment, rate: Rate)
             if !state.reviewList.contains(reviewId) => Left("Review doesn't exist")
-          case EditReview(reviewId: ReviewId, userId: UserId, comment: Comment, rate: Rate) =>
-            Right(state.addReview(reviewId, userId, comment, rate))
+          case EditReview(reviewId: ReviewId, productId: ProductId, userId: UserId, comment: Comment, rate: Rate) =>
+            Right(state.addReview(reviewId, productId, userId, comment, rate))
         }
 }
