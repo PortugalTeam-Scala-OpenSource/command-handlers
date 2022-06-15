@@ -13,13 +13,13 @@ object Products {
 
   case class State(productsList: Map[ProductId, ProductQuantity]){
     def addProduct(productId: ProductId): State =
-      copy(productsList = productsList + (productId, ProductQuantity(productQuantity = 0)))
+      copy(productsList = productsList + (productId -> ProductQuantity(productQuantity = 0)))
     def removeProduct(productId: ProductId): State =
       copy(productsList = productsList - productId)
     def takeNProducts(productId: ProductId,  n: ProductQuantity): State
-    = copy(productsList = productsList + (productId, ProductQuantity(productsList(productId).productQuantity - n.productQuantity)))
+    = copy(productsList = productsList + (productId -> ProductQuantity(productsList(productId).productQuantity - n.productQuantity)))
     def putNProducts(productId: ProductId, n: ProductQuantity): State
-    = copy(productsList = productsList + (productId, ProductQuantity(productsList(productId).productQuantity + n.productQuantity)))
+    = copy(productsList = productsList + (productId -> ProductQuantity(productsList(productId).productQuantity + n.productQuantity)))
   }
 
   object State {

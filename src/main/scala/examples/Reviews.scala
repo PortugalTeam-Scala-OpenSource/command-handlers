@@ -14,8 +14,14 @@ object Reviews {
   case class EditReview(reviewId: ReviewId, productId: ProductId, userId: UserId, comment: Comment, rate: Rate) extends Commands
 
   case class State(reviewList: Map[ReviewId, Map[ProductId, Map[UserId, Map[Comment, Rate]]]]){
-    def addReview(reviewId: ReviewId, productId: ProductId, userId: UserId, comment: Comment, rate: Rate): State =
-      copy(reviewList = reviewList + (reviewId, productId -> (userId -> (comment -> rate))))
+    def addReview(reviewId: ReviewId, productId: ProductId, userId: UserId, comment: Comment, rate: Rate): State = {
+      val reviewInfoMap = reviewList(reviewId)
+      val productInfoMap = reviewInfoMap(productId)
+      val userInfoMap = productInfoMap(userId)
+
+      copy(reviewList = reviewList + (reviewId -> (reviewInfoMap + (productId -> (productInfoMap + (userId -> (userInfoMap + (comment -> rate))))))))
+    }
+
     def removeReview(reviewId: ReviewId): State =
       copy(reviewList = reviewList.removed(reviewId))
   }

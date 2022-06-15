@@ -4,20 +4,19 @@ object Wishlist {
 
   case class UserId(id: String)
   case class ProductId(id: String)
-  case class Availability(availability: Boolean)
 
   sealed trait Commands
-  case class AddToWishList(userId: UserId, product: Product) extends Commands
-  case class RemoveFromWishList(userId: UserId, product: Product) extends Commands
+  case class AddToWishList(userId: UserId, productId: ProductId) extends Commands
+  case class RemoveFromWishList(userId: UserId, productId: ProductId) extends Commands
 
-  case class State(wishlist: Map[UserId, Map[ProductId, Availability]]){
+  case class State(wishlist: Map[UserId, Set[ProductId]]){
     def addToWishList(userId: UserId, productId: ProductId): State = {
       val productList = wishlist(userId)
-      copy(wishlist = wishlist + (userId, productList + productId))
+      copy(wishlist = wishlist + (userId -> (productList + productId)))
     }
     def removeFromWishList(userId: UserId, productId: ProductId): State = {
       val productList = wishlist(userId)
-      copy(wishlist = wishlist + (userId, productList - productId))
+      copy(wishlist = wishlist + (userId -> (productList - productId)))
     }
   }
 
