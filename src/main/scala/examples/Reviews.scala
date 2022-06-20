@@ -15,11 +15,28 @@ object Reviews {
 
   case class State(reviewList: Map[ReviewId, Map[ProductId, Map[UserId, Map[Comment, Rate]]]]){
     def addReview(reviewId: ReviewId, productId: ProductId, userId: UserId, comment: Comment, rate: Rate): State = {
-      val reviewInfoMap = reviewList(reviewId)
-      val productInfoMap = reviewInfoMap(productId)
-      val userInfoMap = productInfoMap(userId)
-
-      copy(reviewList = reviewList + (reviewId -> (reviewInfoMap + (productId -> (productInfoMap + (userId -> (userInfoMap + (comment -> rate))))))))
+      val newState: Option[State] = for {
+        reviewInfoMap <- reviewList.get(reviewId)
+        productInfoMap <- reviewInfoMap.get(productId)
+        userInfoMap <- productInfoMap.get(userId)
+      } yield {
+        copy(
+          reviewList = reviewList + (
+            reviewId -> (
+              reviewInfoMap + (
+                productId -> (
+                  productInfoMap + (
+                    userId -> (
+                      userInfoMap + (
+                        comment -> rate
+                        )
+                      )
+                    )
+                  )
+                ))
+            ))
+      }
+      newState.getOrElse(this)
     }
 
     def removeReview(reviewId: ReviewId): State =
